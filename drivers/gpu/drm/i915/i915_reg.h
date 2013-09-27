@@ -1807,6 +1807,9 @@
  */
 #define HSW_CXT_TOTAL_SIZE		(17 * PAGE_SIZE)
 
+#define VLV_CLK_CTL2			0x101104
+#define   CLK_CTL2_CZCOUNT_30NS_SHIFT	28
+
 /*
  * Overlay regs
  */
