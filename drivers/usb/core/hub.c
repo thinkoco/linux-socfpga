@@ -1715,7 +1715,11 @@ static int hub_probe(struct usb_interface *intf, const struct usb_device_id *id)
 	 * bus_resume methods.
 	 */
 	if (hdev->parent) {		/* normal device */
+#ifdef CONFIG_USB_ZYNQ_PHY
+		usb_disable_autosuspend(hdev);
+#else
 		usb_enable_autosuspend(hdev);
+#endif
 	} else {			/* root hub */
 		const struct hc_driver *drv = bus_to_hcd(hdev->bus)->driver;
 
