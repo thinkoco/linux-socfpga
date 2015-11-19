@@ -831,7 +831,7 @@
 		};
 
 		spi1: spi@fff01000 {
-			compatible = "ssnps,dw-apb-ssi";
+			compatible = "snps,dw-apb-ssi";
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <0xfff01000 0x1000>;
