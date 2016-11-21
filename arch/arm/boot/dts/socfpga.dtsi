@@ -497,7 +497,7 @@
 			resets = <&rst LWHPS2FPGA_RESET>;
 			reset-names = "lwhps2fpga";
 			clocks = <&l4_main_clk>;
-			bridge-enable = <1>;//add by knat
+			bridge-enable = <1>;
 		};
 
 		fpga_bridge1: fpga-bridge@ff500000 {
@@ -506,7 +506,7 @@
 			resets = <&rst HPS2FPGA_RESET>;
 			reset-names = "hps2fpga";
 			clocks = <&l4_main_clk>;
-			bridge-enable = <1>;//add by knat
+			bridge-enable = <1>;
 		};
 
 		fpga_bridge2: fpga-bridge@ff600000 {
@@ -515,7 +515,7 @@
 			resets = <&rst FPGA2HPS_RESET>;
 			reset-names = "fpga2hps";
 			clocks = <&l4_main_clk>;
-			bridge-enable = <1>;//add by knat
+			bridge-enable = <1>;
 		};
 
 		fpga_bridge3: fpga2sdram-bridge {

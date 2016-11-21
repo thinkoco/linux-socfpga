@@ -1,0 +1,10 @@
+comment "Altera soc OpenCL module"
+
+config ALTERA_OPENCL
+	tristate "Altera OpenCL DE1_SOC"
+	depends on ALTERA_STAPL
+	default n
+	help
+	  Say Y here if you want support for oepncl from the
+	  kernel.  The altera opencl drivers.
+

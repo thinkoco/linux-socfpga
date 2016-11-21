@@ -17,3 +17,7 @@ obj-$(CONFIG_ALTERA_FREEZE_BRIDGE)	+= altera-freeze-bridge.o
 
 # High Level Interfaces
 obj-$(CONFIG_FPGA_REGION)		+= fpga-region.o
+
+# OpenCl for Altera CyClone V
+obj-y					+= aclsoc_drv/
+
