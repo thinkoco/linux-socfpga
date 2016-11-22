@@ -57,12 +57,13 @@ source "sound/soc/tegra/Kconfig"
 source "sound/soc/txx9/Kconfig"
 source "sound/soc/ux500/Kconfig"
 source "sound/soc/xtensa/Kconfig"
-
+source "sound/soc/de1_soc_sound/Kconfig"
 # Supported codecs
 source "sound/soc/codecs/Kconfig"
 
 # generic frame-work
 source "sound/soc/generic/Kconfig"
+
 
 endif	# SND_SOC
 
