@@ -45,7 +45,45 @@
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 	};
+
+	soc {
+		gpio0 {
+			status = "okay";
+		};
+
+		gpio1 {
+			status = "okay";
+		};
+
+		gpio2 {
+			status = "okay";
+		};
+	};
 	
+        sound {
+	        compatible = "opencores,de1soc-wm8731-audio";
+		i2s-controller = <&i2s>;
+		audio-codec = <&codec>;
+		i2c-mux-gpio = <&portb 19 0>;
+        };
+
+	clk48: clk48 {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency  = <24576000>;
+		clock-output-names = "clk48";
+	};
+
+	clk44: clk44 {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency  = <33868800>;
+		clock-output-names = "clk44";
+	};
+
+
+
+
 	hps_0_bridges: bridge@0xc0000000 {
 		compatible = "altr,bridge-14.1", "simple-bus";
 		reg = <0xc0000000 0x20000000>,
@@ -54,6 +92,8 @@
 		#address-cells = <2>;
 		#size-cells = <1>;
 		ranges = <0x00000000 0x00000000 0xc0000000 0x00010000>,
+			<0x00000001 0x00000000 0xFF200000 0x00000020>,
+			<0x00000001 0x00000020 0xFF200020 0x00000020>,
 			<0x00000001 0x00000100 0xFF200100 0x00000080>,
 			<0x00000001 0x00010040 0xFF210040 0x00000020>,
 			<0x00000001 0x00010080 0xFF210080 0x00000010>,
@@ -67,6 +107,17 @@
 			mem-word-width = < 128 >;
 			bits-per-color = < 8 >;				
 			}; //end vip@0x40100 (alt_vip_vfr_0)
+
+		i2s: i2s@0 {
+			#sound-dai-cells = <1>;
+			compatible = "opencores,i2s";
+			reg = <0x00000001 0x00000000 0x00000020>,
+				<0x00000001 0x00000020 0x00000020>;
+			clocks = <&clk44>, <&clk48>;
+			clock-names = "clk44", "clk48";
+			dmas = <&pdma 0>, <&pdma 1>;
+			dma-names = "tx", "rx";
+			};
 
 		acl_iface_led_pio: gpio@0x100010040 {
 			compatible = "ALTR,pio-13.1", "ALTR,pio-1.0", "altr,pio-1.0";
@@ -120,17 +171,17 @@
 	rxc-skew-ps = <2000>;
 };
 
-&gpio0 {	/* GPIO 0..29 */
-	status = "okay";
-};
+//&gpio0 {	/* GPIO 0..29 */
+//	status = "okay";
+//};
 
-&gpio1 {	/* GPIO 30..57 */
-	status = "okay";
-};
+//&gpio1 {	/* GPIO 30..57 */
+//	status = "okay";
+//};
 
-&gpio2 {	/* GPIO 58..66 (HLGPI 0..13 at offset 13) */
-	status = "okay";
-};
+//&gpio2 {	/* GPIO 58..66 (HLGPI 0..13 at offset 13) */
+//	status = "okay";
+//};
 
 &i2c1 {
 	status = "okay";
@@ -160,5 +211,23 @@
 
 &watchdog0{
 	status = "okay";
+};
+
+&i2c0 {
+	status = "okay";
+	clock-frequency = <100000>;
+	speed-mode = <0>;
+
+	codec: wm8731@34 {
+		#sound-dai-cells = <0>;
+		compatible = "wlf,wm8731";
+		reg = <0x1a>;
+	};
+	adxl345@53 {
+		compatible = "adi,adxl34x";
+		reg = <0x53>;
+		interrupt-parent = <&portc>;
+		interrupts = <3 4>;
+	};
 };
 		
