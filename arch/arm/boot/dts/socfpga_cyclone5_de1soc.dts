@@ -78,15 +78,15 @@
         };
 
 	soc {
-		gpio@ff708000 {
+		gpio0 {
 			status = "okay";
 		};
 
-		gpio@ff709000 {
+		gpio1 {
 			status = "okay";
 		};
 
-		gpio@ff70a000 {
+		gpio2 {
 			status = "okay";
 		};
 	};
@@ -256,7 +256,7 @@
 	codec: wm8731@34 {
 		#sound-dai-cells = <0>;
 		compatible = "wlf,wm8731";
-		reg = <0x34>;
+		reg = <0x1a>;
 	};
 	adxl345@53 {
 		compatible = "adi,adxl34x";
