@@ -16,7 +16,7 @@
  */
 
 #include "socfpga_cyclone5.dtsi"
-
+#include <dt-bindings/interrupt-controller/irq.h>
 / {
 	model = "Terasic DE1_SOC";
 	compatible = "altr,socfpga-cyclone5", "altr,socfpga";
@@ -45,26 +45,43 @@
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 	};
-
-	soc {
-		gpio0 {
-			status = "okay";
-		};
-
-		gpio1 {
-			status = "okay";
-		};
-
-		gpio2 {
-			status = "okay";
-		};
-	};
 	
+	leds {
+		compatible = "gpio-leds";
+		user {
+			label = "user-led";
+			gpios = <&gpio1 24 0>;
+			linux,default-trigger = "heartbeat";
+		};
+#if 0
+		/* Always-on to enable HPS i2c */
+		/* The alternative is to model it as a regulator for codec */
+		i2c0mux {
+			label = "i2c0-mux";
+			gpios = <&gpio1 19 0>;
+			linux,default-trigger = "default-on";
+		};
+#endif
+	};
+
+        gpio_keys {
+		compatible = "gpio-keys";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		user_pb {
+			label = "user_pb";
+			gpios = <&gpio1 25 0>;
+			linux,code = <28>;
+			gpio-key,wakeup;
+                };
+        };
+
         sound {
 	        compatible = "opencores,de1soc-wm8731-audio";
 		i2s-controller = <&i2s>;
 		audio-codec = <&codec>;
-		i2c-mux-gpio = <&portb 19 0>;
+		i2c-mux-gpio = <&gpio1 19 0>;
         };
 
 	clk48: clk48 {
@@ -157,6 +174,10 @@
 	
 };
 
+&osc1 {
+	clock-frequency = <25000000>;
+};
+
 &gmac1 {
 	status = "okay";
 	phy-mode = "rgmii";
@@ -171,17 +192,17 @@
 	rxc-skew-ps = <2000>;
 };
 
-//&gpio0 {	/* GPIO 0..29 */
-//	status = "okay";
-//};
+&gpio0 {	/* GPIO 0..29 */
+	status = "okay";
+};
 
-//&gpio1 {	/* GPIO 30..57 */
-//	status = "okay";
-//};
+&gpio1 {	/* GPIO 30..57 */
+	status = "okay";
+};
 
-//&gpio2 {	/* GPIO 58..66 (HLGPI 0..13 at offset 13) */
-//	status = "okay";
-//};
+&gpio2 {	/* GPIO 58..66 (HLGPI 0..13 at offset 13) */
+	status = "okay";
+};
 
 &i2c1 {
 	status = "okay";
@@ -226,7 +247,7 @@
 	adxl345@53 {
 		compatible = "adi,adxl34x";
 		reg = <0x53>;
-		interrupt-parent = <&portc>;
+		interrupt-parent = <&gpio2>;
 		interrupts = <3 4>;
 	};
 };
