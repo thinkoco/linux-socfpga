@@ -77,6 +77,20 @@
                 };
         };
 
+	soc {
+		gpio@ff708000 {
+			status = "okay";
+		};
+
+		gpio@ff709000 {
+			status = "okay";
+		};
+
+		gpio@ff70a000 {
+			status = "okay";
+		};
+	};
+
         sound {
 	        compatible = "opencores,de1soc-wm8731-audio";
 		i2s-controller = <&i2s>;
@@ -192,17 +206,17 @@
 	rxc-skew-ps = <2000>;
 };
 
-&gpio0 {	/* GPIO 0..29 */
-	status = "okay";
-};
+//&gpio0 {	/* GPIO 0..29 */
+//	status = "okay";
+//};
 
-&gpio1 {	/* GPIO 30..57 */
-	status = "okay";
-};
+//&gpio1 {	/* GPIO 30..57 */
+//	status = "okay";
+//};
 
-&gpio2 {	/* GPIO 58..66 (HLGPI 0..13 at offset 13) */
-	status = "okay";
-};
+//&gpio2 {	/* GPIO 58..66 (HLGPI 0..13 at offset 13) */
+//	status = "okay";
+//};
 
 &i2c1 {
 	status = "okay";
@@ -242,7 +256,7 @@
 	codec: wm8731@34 {
 		#sound-dai-cells = <0>;
 		compatible = "wlf,wm8731";
-		reg = <0x1a>;
+		reg = <0x34>;
 	};
 	adxl345@53 {
 		compatible = "adi,adxl34x";
