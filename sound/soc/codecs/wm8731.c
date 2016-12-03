@@ -357,6 +357,9 @@ static int wm8731_hw_params(struct snd_pcm_substream *substream,
 	case 24:
 		iface |= 0x0008;
 		break;
+	case 32:
+		iface |= 0x000c;
+		break;
 	}
 
 	wm8731_set_deemph(codec);
@@ -531,7 +534,7 @@ static int wm8731_startup(struct snd_pcm_substream *substream,
 #define WM8731_RATES SNDRV_PCM_RATE_8000_96000
 
 #define WM8731_FORMATS (SNDRV_PCM_FMTBIT_S16_LE | SNDRV_PCM_FMTBIT_S20_3LE |\
-	SNDRV_PCM_FMTBIT_S24_LE)
+	SNDRV_PCM_FMTBIT_S24_LE | SNDRV_PCM_FMTBIT_S32_LE)
 
 static const struct snd_soc_dai_ops wm8731_dai_ops = {
 	.startup	= wm8731_startup,

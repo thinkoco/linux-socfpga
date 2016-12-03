@@ -59,7 +59,7 @@ source "sound/soc/ux500/Kconfig"
 
 # Supported codecs
 source "sound/soc/codecs/Kconfig"
-
+source "sound/soc/de1_soc_audio/Kconfig"
 # generic frame-work
 source "sound/soc/generic/Kconfig"
 

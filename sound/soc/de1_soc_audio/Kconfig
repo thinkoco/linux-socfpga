@@ -1,0 +1,5 @@
+config SND_SOC_DE1SOC
+	tristate "DE1SOC Audio "
+	help
+	  Enable support for DE1SOC Audio WM8731 & opencores I2S.
+
