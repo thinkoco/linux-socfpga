@@ -111,7 +111,7 @@
 #define ACL_PCIE_DMA_IRQ_VEC                       1
 
 // PLL related
-#define USE_KERNELPLL_RECONFIG                     1 
+#define USE_KERNELPLL_RECONFIG                     0 
 #define ACL_PCIE_KERNELPLL_RECONFIG_BAR            0
 #define ACL_PCIE_KERNELPLL_RECONFIG_OFFSET   0x0c000
 
