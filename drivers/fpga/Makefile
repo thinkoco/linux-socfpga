@@ -19,5 +19,11 @@ obj-$(CONFIG_ALTERA_FREEZE_BRIDGE)	+= altera-freeze-bridge.o
 obj-$(CONFIG_FPGA_REGION)		+= fpga-region.o
 
 # OpenCl for Altera CyClone V
-obj-y					+= aclsoc_drv/
+obj-y					+= aclsoc_drv_14.1/
+obj-y					+= aclsoc_drv_16.0/
+obj-y					+= aclsoc_drv_16.1/
+obj-y					+= c5soc_drv_17.0/
+obj-y					+= a10soc_drv_17.0/
+obj-y					+= c5soc_drv_17.1/
+obj-y					+= a10soc_drv_17.1/
 

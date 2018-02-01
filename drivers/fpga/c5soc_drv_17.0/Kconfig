@@ -1,7 +1,5 @@
-comment "Altera soc OpenCL module"
-
-config ALTERA_OPENCL
-	tristate "Altera OpenCL DE1_SOC"
+config INTELFPGA_CYCLONE_V_OPENCL_170
+	tristate "IntelFPGA Cyclone V OpenCL Driver 17.0"
 	depends on ALTERA_STAPL
 	default n
 	help

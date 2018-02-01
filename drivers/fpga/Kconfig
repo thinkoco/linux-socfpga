@@ -62,7 +62,77 @@ config ALTERA_FREEZE_BRIDGE
 	  isolate one region of the FPGA from the busses while that
 	  region is being reprogrammed.
 
-source "drivers/fpga/aclsoc_drv/Kconfig"
+#comment "IntelFPGA Cyclone V OpenCL module"
+choice
+	prompt "Choose One of IntelFPGA OpenCL Driver"
+	default ALTERA_OPENCL_161
+
+	config ALTERA_OPENCL_141
+		tristate "Altera SocFPGA OpenCL Driver 14.1"
+		select ALTERA_STAPL
+		help
+		  Say Y here if you want support for oepncl from the
+		  kernel.  The altera opencl drivers.
+
+	config ALTERA_OPENCL_160
+		tristate "Altera SocFPGA OpenCL Driver 16.0"
+		select ALTERA_STAPL
+		help
+		  Say Y here if you want support for oepncl from the
+		  kernel.  The altera opencl drivers.
+
+	config ALTERA_OPENCL_161
+		tristate "Altera SocFPGA OpenCL Driver 16.1"
+		select ALTERA_STAPL 
+		help
+		  Say Y here if you want support for oepncl from the
+		  kernel.  The altera opencl drivers.
+
+
+	config INTELFPGA_CYCLONE_V_OPENCL_170
+		tristate "IntelFPGA Cyclone V OpenCL Driver 17.0"
+		select ALTERA_STAPL
+		help
+		  Say Y here if you want support for oepncl from the
+		  kernel.  The altera opencl drivers.
+
+	config INTELFPGA_ARRIA_10_OPENCL_170
+		tristate "IntelFPGA Arria 10 OpenCL Driver 17.0"
+		select ALTERA_STAPL
+		select FPGA_MGR_SOCFPGA_A10
+		help
+		  Say Y here if you want support for oepncl from the
+		  kernel.  The altera opencl drivers.
+
+	config INTELFPGA_CYCLONE_V_OPENCL_171
+		tristate "IntelFPGA Cyclone V OpenCL Driver 17.1"
+		select ALTERA_STAPL
+		help
+		  Say Y here if you want support for oepncl from the
+		  kernel.  The altera opencl drivers.
+
+	config INTELFPGA_ARRIA_10_OPENCL_171
+		tristate "IntelFPGA Arria 10 OpenCL Driver 17.1"
+		select ALTERA_STAPL
+		select FPGA_MGR_SOCFPGA_A10
+		help
+		  Say Y here if you want support for oepncl from the
+		  kernel.  The altera opencl drivers.
+
+
+endchoice
+
+
+
+
+
+#source "drivers/fpga/aclsoc_drv_14.1/Kconfig"
+#source "drivers/fpga/aclsoc_drv_16.0/Kconfig"
+#source "drivers/fpga/aclsoc_drv_16.1/Kconfig"
+#source "drivers/fpga/c5soc_drv_17.0/Kconfig"
+#source "drivers/fpga/a10soc_drv_17.0/Kconfig"
+#source "drivers/fpga/c5soc_drv_17.1/Kconfig"
+#source "drivers/fpga/a10soc_drv_17.1/Kconfig"
 
 endif # FPGA
 

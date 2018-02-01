@@ -1,0 +1,8 @@
+config ALTERA_OPENCL_161
+	tristate "Altera SocFPGA OpenCL Driver 16.1"
+	depends on ALTERA_STAPL
+	default n
+	help
+	  Say Y here if you want support for oepncl from the
+	  kernel.  The altera opencl drivers.
+

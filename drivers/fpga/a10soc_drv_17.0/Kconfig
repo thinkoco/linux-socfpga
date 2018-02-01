@@ -1,0 +1,8 @@
+config INTELFPGA_ARRIA_10_OPENCL_170
+	tristate "IntelFPGA Arria 10 OpenCL Driver 17.0"
+	select ALTERA_STAPL
+	default n
+	help
+	  Say Y here if you want support for oepncl from the
+	  kernel.  The altera opencl drivers.
+
