@@ -1,0 +1,200 @@
+/*
+ *  Copyright (C) 2013 Steffen Trumtrar <s.trumtrar@pengutronix.de>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "socfpga_cyclone5.dtsi"
+#include <dt-bindings/interrupt-controller/irq.h>
+/ {
+	model = "Terasic DE10_Nano";
+	compatible = "altr,socfpga-cyclone5", "altr,socfpga";
+
+	chosen {
+		bootargs = "earlyprintk";
+		stdout-path = "serial0:115200n8";
+	};
+
+	memory {
+		name = "memory";
+		device_type = "memory";
+		reg = <0x0 0x40000000>; /* 1GB */
+	};
+
+	aliases {
+		/* this allow the ethaddr uboot environmnet variable contents
+		 * to be added to the gmac1 device tree blob.
+		 */
+		ethernet0 = &gmac1;
+	};
+
+	regulator_3_3v: vcc3p3-regulator {
+		compatible = "regulator-fixed";
+		regulator-name = "VCC3P3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+	};
+	
+	leds {
+		compatible = "gpio-leds";
+		user {
+			label = "hps_leds";
+			gpios = <&portb 24 0>;
+			linux,default-trigger = "heartbeat";
+		};
+	};
+
+	soc {
+		gpio0 {
+			status = "okay";
+		};
+
+		gpio1 {
+			status = "okay";
+		};
+
+		gpio2 {
+			status = "okay";
+		};
+	};
+
+
+	hps_0_bridges: bridge@0xc0000000 {
+		compatible = "altr,bridge-14.1", "simple-bus";
+		reg = <0xc0000000 0x20000000>,
+			<0xff200000 0x00200000>;
+		reg-names = "axi_h2f", "axi_h2f_lw";
+		#address-cells = <2>;
+		#size-cells = <1>;
+		ranges = <0x00000001 0x00002000 0xff202000 0x00000008>,
+			<0x00000001 0x00030000 0xff230000 0x00000100>,
+			<0x00000001 0x00031000 0xff231000 0x00000080>,
+			<0x00000001 0x00001000 0xff201000 0x00000008>,
+			<0x00000001 0x00003000 0xff203000 0x00000010>,
+			<0x00000001 0x00003010 0xff203010 0x00000010>,
+			<0x00000001 0x00003020 0xff203020 0x00000010>;
+
+		alt_vip_vfr_hdmi: vip@0x100031000 {	
+			compatible = "ALTR,vip-frame-reader-14.0", "ALTR,vip-frame-reader-9.1";
+			reg = <0x00000001 0x00031000 0x00000080>;
+			max-width = <1024>;	/* MAX_IMAGE_WIDTH type NUMBER */
+			max-height = <768>;	/* MAX_IMAGE_HEIGHT type NUMBER */
+			bits-per-color = <8>;	/* BITS_PER_PIXEL_PER_COLOR_PLANE type NUMBER */
+			colors-per-beat = <4>;	/* NUMBER_OF_CHANNELS_IN_PARALLEL type NUMBER */
+			beats-per-pixel = <1>;	/* NUMBER_OF_CHANNELS_IN_SEQUENCE type NUMBER */
+			mem-word-width = <128>;	/* MEM_PORT_WIDTH type NUMBER */
+			}; //end vip@0x100031000 (alt_vip_vfr_hdmi)
+
+		led_pio: gpio@0x100003000 {
+			compatible = "altr,pio-13.1", "altr,pio-1.0";
+			reg = <0x00000001 0x00003000 0x00000010>;
+			altr,gpio-bank-width = <7>;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
+			resetvalue = <127>;	/* embeddedsw.dts.params.resetvalue type NUMBER */
+			#gpio-cells = <2>;
+			gpio-controller;
+			}; //end gpio@0x100003000 (led_pio)
+
+		dipsw_pio: gpio@0x100003010 {
+			compatible = "ALTR,pio-13.1", "ALTR,pio-1.0", "altr,pio-1.0";
+			reg = <0x00000001 0x00010080 0x00000010 >;
+			interrupt-parent = < &intc >;
+			interrupts = < 0 40 1 >;
+			width = < 4 >;	/* embeddedsw.dts.params.width type NUMBER */
+			resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
+			edge_type = < 2 >;	/* embeddedsw.dts.params.edge_type type NUMBER */
+			level_trigger = < 0 >;	/* embeddedsw.dts.params.level_trigger type NUMBER */
+			#gpio-cells = < 2 >;
+			gpio-controller;
+			}; //end gpio@0x100003010 (dipsw_pio)
+
+		button_pio: gpio@0x100003020 {
+			compatible = "ALTR,pio-13.1", "ALTR,pio-1.0", "altr,pio-1.0";
+			reg = <0x00000001 0x00003010 0x00000010>;
+			interrupt-parent = < &intc >;
+			interrupts = < 0 41 1 >;
+			width = < 2 >;	/* embeddedsw.dts.params.width type NUMBER */
+			resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
+			edge_type = < 1 >;	/* embeddedsw.dts.params.edge_type type NUMBER */
+			level_trigger = < 0 >;	/* embeddedsw.dts.params.level_trigger type NUMBER */
+			#gpio-cells = < 2 >;
+			gpio-controller;
+			}; //end gpio@0x100003020 (button_pio)
+
+	}; //end bridge@0xc0000000 (hps_0_bridges)
+	
+};
+
+&osc1 {
+	clock-frequency = <25000000>;
+};
+
+&gmac1 {
+	status = "okay";
+	phy-mode = "rgmii";
+
+	rxd0-skew-ps = <0>;
+	rxd1-skew-ps = <0>;
+	rxd2-skew-ps = <0>;
+	rxd3-skew-ps = <0>;
+	txen-skew-ps = <0>;
+	txc-skew-ps = <2600>;
+	rxdv-skew-ps = <0>;
+	rxc-skew-ps = <2000>;
+};
+
+
+
+&i2c0 {
+	status = "okay";
+
+	accel1: accelerometer@53 {
+		compatible = "adi,adxl345";
+		reg = <0x53>;
+
+		interrupt-parent = <&portc>;
+		interrupts = <3 2>;
+	};
+};
+
+&mmc0 {
+	vmmc-supply = <&regulator_3_3v>;
+	vqmmc-supply = <&regulator_3_3v>;
+	status = "okay";
+};
+
+&usb1 {
+	status = "okay";
+};
+
+&uart0{
+	status = "okay";
+};
+
+&watchdog0{
+	status = "okay";
+};
+
+&i2c0 {
+	status = "okay";
+	clock-frequency = <100000>;
+	speed-mode = <0>;
+
+	adxl345@53 {
+		compatible = "adi,adxl34x";
+		reg = <0x53>;
+		interrupt-parent = <&gpio2>;
+		interrupts = <3 4>;
+	};
+};
+		
