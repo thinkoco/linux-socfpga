@@ -70,21 +70,21 @@
 	status = "okay";
 };
 
-&dcan0: d_can@ffc00000 {
+&can0 {
 	status = "okay";
 };
 
-&i2c0: i2c@ffc04000 {
+&i2c0 {
 	speed-mode = <0>;
 	status = "okay";
 };
 
-&i2c1: i2c@ffc05000 {
+&i2c1 {
 	speed-mode = <0>;
 	status = "okay";
 };
 
-uart0@ffc02000 {
+&uart0{
 	status = "okay";
 };
 
