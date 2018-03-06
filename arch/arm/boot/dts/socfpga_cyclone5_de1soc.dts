@@ -18,7 +18,7 @@
 #include "socfpga_cyclone5.dtsi"
 
 / {
-	model = "Terasic SoCkit";
+	model = "Terasic DE1-SoC";
 	compatible = "altr,socfpga-cyclone5", "altr,socfpga";
 
 	chosen {
@@ -36,6 +36,7 @@
 		 * to be added to the gmac1 device tree blob.
 		 */
 		ethernet0 = &gmac1;
+		serial0 = &uart0;
 	};
 
 	regulator_3_3v: vcc3p3-regulator {
@@ -66,6 +67,24 @@
 };
 
 &usb1 {
+	status = "okay";
+};
+
+&dcan0: d_can@ffc00000 {
+	status = "okay";
+};
+
+&i2c0: i2c@ffc04000 {
+	speed-mode = <0>;
+	status = "okay";
+};
+
+&i2c1: i2c@ffc05000 {
+	speed-mode = <0>;
+	status = "okay";
+};
+
+uart0@ffc02000 {
 	status = "okay";
 };
 
