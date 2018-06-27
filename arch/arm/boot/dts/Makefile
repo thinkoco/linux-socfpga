@@ -402,8 +402,11 @@ dtb-$(CONFIG_ARCH_SOCFPGA) += socfpga_arria5_socdk.dtb \
 	socfpga_cyclone5_socdk.dtb \
 	socfpga_cyclone5_sockit.dtb \
 	socfpga_cyclone5_de1soc.dtb \
+	socfpga_cyclone5_de1soc_x2go.dtb \
 	socfpga_cyclone5_de10_nano.dtb \
+	socfpga_cyclone5_de10_nano_x2go.dtb \
 	socfpga_cyclone5_de10_standard.dtb \
+	socfpga_cyclone5_de10_standard_x2go.dtb \
 	socfpga_cyclone5_socrates.dtb \
 	socfpga_cyclone5_trcom.dtb \
 	socfpga_vt.dtb
