@@ -414,10 +414,10 @@ static int socfpga_fpga_ops_configure_init(struct fpga_manager *mgr,
 	struct socfpga_fpga_priv *priv = mgr->priv;
 	int ret;
 
-	if (info->flags & FPGA_MGR_PARTIAL_RECONFIG) {
-		dev_err(&mgr->dev, "Partial reconfiguration not supported.\n");
-		return -EINVAL;
-	}
+//	if (info->flags & FPGA_MGR_PARTIAL_RECONFIG) {
+//		dev_err(&mgr->dev, "Partial reconfiguration not supported.\n");
+//		return -EINVAL;
+//	}
 	/* Steps 1 - 5: Reset the FPGA */
 	ret = socfpga_fpga_reset(mgr);
 	if (ret)
@@ -519,6 +519,7 @@ static int socfpga_fpga_ops_configure_complete(struct fpga_manager *mgr,
 }
 
 /* Translate state register values to FPGA framework state */
+/*
 static const enum fpga_mgr_states socfpga_state_to_framework_state[] = {
 	[SOCFPGA_FPGMGR_STAT_POWER_OFF] = FPGA_MGR_STATE_POWER_OFF,
 	[SOCFPGA_FPGMGR_STAT_RESET] = FPGA_MGR_STATE_RESET,
@@ -527,6 +528,18 @@ static const enum fpga_mgr_states socfpga_state_to_framework_state[] = {
 	[SOCFPGA_FPGMGR_STAT_USER_MODE] = FPGA_MGR_STATE_OPERATING,
 	[SOCFPGA_FPGMGR_STAT_UNKNOWN] = FPGA_MGR_STATE_UNKNOWN,
 };
+*/
+
+static const enum fpga_mgr_states socfpga_state_to_framework_state[] = {
+	[SOCFPGA_FPGMGR_STAT_POWER_UP] = FPGA_MGR_STATE_POWER_UP,
+	[SOCFPGA_FPGMGR_STAT_RESET] = FPGA_MGR_STATE_RESET,
+	[SOCFPGA_FPGMGR_STAT_CFG] = FPGA_MGR_STATE_WRITE,
+	[SOCFPGA_FPGMGR_STAT_INIT] = FPGA_MGR_STATE_WRITE_INIT,
+	[SOCFPGA_FPGMGR_STAT_USER_MODE] = FPGA_MGR_STATE_OPERATING,
+	[SOCFPGA_FPGMGR_STAT_UNKNOWN] = FPGA_MGR_STATE_UNKNOWN,
+	[SOCFPGA_FPGMGR_STAT_POWER_OFF] = FPGA_MGR_STATE_POWER_OFF,
+};
+
 
 static enum fpga_mgr_states socfpga_fpga_ops_state(struct fpga_manager *mgr)
 {
@@ -544,8 +557,22 @@ static enum fpga_mgr_states socfpga_fpga_ops_state(struct fpga_manager *mgr)
 	return ret;
 }
 
+
+static u64 socfpga_mgr_status(struct fpga_manager *mgr)
+{
+	struct socfpga_fpga_priv *priv = mgr->priv;
+	u32 state;
+
+	state = socfpga_fpga_state_get(priv);
+
+	socfpga_fpga_readl(priv, SOCFPGA_FPGMGR_GPIO_EXT_PORTA_OFST);	
+
+	return socfpga_fpga_readl(priv, SOCFPGA_FPGMGR_STAT_OFST);
+}
+
 static const struct fpga_manager_ops socfpga_fpga_ops = {
 	.state = socfpga_fpga_ops_state,
+	.status = socfpga_mgr_status,
 	.write_init = socfpga_fpga_ops_configure_init,
 	.write = socfpga_fpga_ops_configure_write,
 	.write_complete = socfpga_fpga_ops_configure_complete,

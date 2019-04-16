@@ -17,13 +17,16 @@
  */
 #include <linux/mutex.h>
 #include <linux/platform_device.h>
+#include <linux/cdev.h>
 
 #ifndef _LINUX_FPGA_MGR_H
 #define _LINUX_FPGA_MGR_H
 
+#define FPGA_MGR_DEV_BUSY 0
+
 struct fpga_manager;
 struct sg_table;
-
+extern const struct file_operations socfpga_mgr_fops;
 /**
  * enum fpga_mgr_states - fpga framework states
  * @FPGA_MGR_STATE_UNKNOWN: can't determine state
@@ -104,6 +107,7 @@ struct fpga_image_info {
 struct fpga_manager_ops {
 	size_t initial_header_size;
 	enum fpga_mgr_states (*state)(struct fpga_manager *mgr);
+	u64 (*status)(struct fpga_manager *mgr, char *buf);
 	int (*write_init)(struct fpga_manager *mgr,
 			  struct fpga_image_info *info,
 			  const char *buf, size_t count);
@@ -112,6 +116,7 @@ struct fpga_manager_ops {
 	int (*write_complete)(struct fpga_manager *mgr,
 			      struct fpga_image_info *info);
 	void (*fpga_remove)(struct fpga_manager *mgr);
+	const struct attribute_group **groups;
 };
 
 /**
@@ -126,6 +131,7 @@ struct fpga_manager_ops {
 struct fpga_manager {
 	const char *name;
 	struct device dev;
+	struct cdev cdev;
 	struct mutex ref_mutex;
 	enum fpga_mgr_states state;
 	const struct fpga_manager_ops *mops;

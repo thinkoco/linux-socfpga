@@ -4,7 +4,7 @@
 
 # Core FPGA Manager Framework
 fpga_mgr-objs				:= fpga-mgr.o fpga-mgr-debugfs.o
-obj-$(CONFIG_FPGA)			+= fpga_mgr.o
+obj-$(CONFIG_FPGA)			+= fpga_mgr.o fpga-mgr-fops.o
 
 # FPGA Manager Drivers
 obj-$(CONFIG_FPGA_MGR_ICE40_SPI)	+= ice40-spi.o

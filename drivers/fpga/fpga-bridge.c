@@ -255,12 +255,51 @@ static ssize_t state_show(struct device *dev,
 	return scnprintf(buf, 10, "%s\n", enable ? "enabled" : "disabled");
 }
 
+
+static ssize_t fpga_bridge_enable_show(struct device *dev,
+				       struct device_attribute *attr,
+				       char *buf)
+{
+	struct fpga_bridge *bridge = to_fpga_bridge(dev);
+	int enabled;
+
+	enabled = bridge->br_ops->enable_show(bridge);
+
+	return sprintf(buf, "%d\n", enabled);
+}
+
+static ssize_t fpga_bridge_enable_set(struct device *dev,
+				      struct device_attribute *attr,
+				      const char *buf, size_t count)
+{
+	struct fpga_bridge *bridge = to_fpga_bridge(dev);
+	bool enable;
+
+	if ((count != 1) && (count != 2))
+		return -EINVAL;
+
+	if ((count == 2) && (buf[1] != '\n'))
+		return -EINVAL;
+
+	if ((buf[0] != '0') && (buf[0] != '1'))
+		return -EINVAL;
+
+	enable = (buf[0] == '1');
+	bridge->br_ops->enable_set(bridge, enable);
+
+	return count;
+}
+
+static DEVICE_ATTR(enable, S_IRUGO | S_IWUSR, fpga_bridge_enable_show,
+	fpga_bridge_enable_set);
+
 static DEVICE_ATTR_RO(name);
 static DEVICE_ATTR_RO(state);
 
 static struct attribute *fpga_bridge_attrs[] = {
 	&dev_attr_name.attr,
 	&dev_attr_state.attr,
+	&dev_attr_enable.attr,
 	NULL,
 };
 ATTRIBUTE_GROUPS(fpga_bridge);
@@ -309,7 +348,8 @@ int fpga_bridge_register(struct device *dev, const char *name,
 	bridge->dev.id = id;
 	dev_set_drvdata(dev, bridge);
 
-	ret = dev_set_name(&bridge->dev, "br%d", id);
+//	ret = dev_set_name(&bridge->dev, "br%d", id);
+	ret = dev_set_name(&bridge->dev, bridge->name);
 	if (ret)
 		goto error_device;
 
@@ -364,7 +404,8 @@ static int __init fpga_bridge_dev_init(void)
 {
 	spin_lock_init(&bridge_list_lock);
 
-	fpga_bridge_class = class_create(THIS_MODULE, "fpga_bridge");
+	//fpga_bridge_class = class_create(THIS_MODULE, "fpga_bridge");
+	fpga_bridge_class = class_create(THIS_MODULE, "fpga-bridge");
 	if (IS_ERR(fpga_bridge_class))
 		return PTR_ERR(fpga_bridge_class);
 

@@ -96,7 +96,9 @@
 		base_fpga_region: base-fpga-region {
 			compatible = "fpga-region";
 			fpga-mgr = <&fpgamgr0>;
-
+			fpga-bridges = <&fpga_bridge0>, <&fpga_bridge1>,
+			<&fpga_bridge2>;
+			ranges = <0 0xff200000 0x100000>;
 			#address-cells = <0x1>;
 			#size-cells = <0x1>;
 		};
@@ -525,20 +527,33 @@
 			compatible = "altr,socfpga-lwhps2fpga-bridge";
 			reg = <0xff400000 0x100000>;
 			resets = <&rst LWHPS2FPGA_RESET>;
+			reset-names = "lwhps2fpga";
 			clocks = <&l4_main_clk>;
+			bridge-enable=<1>;
 		};
 
 		fpga_bridge1: fpga_bridge@ff500000 {
 			compatible = "altr,socfpga-hps2fpga-bridge";
 			reg = <0xff500000 0x10000>;
 			resets = <&rst HPS2FPGA_RESET>;
+			reset-names = "hps2fpga";
 			clocks = <&l4_main_clk>;
+			bridge-enable=<1>;
+		};
+
+		fpga_bridge2: fpga-bridge@ff600000 {
+			compatible = "altr,socfpga-fpga2hps-bridge";
+			reg = <0xff600000 0x100000>;
+			resets = <&rst FPGA2HPS_RESET>;
+			reset-names = "fpga2hps";
+			clocks = <&l4_main_clk>;
+			bridge-enable=<1>;
 		};
 
 		fpgamgr0: fpgamgr@ff706000 {
 			compatible = "altr,socfpga-fpga-mgr";
 			reg = <0xff706000 0x1000
-			       0xffb90000 0x4>;
+			       0xffb90000 0x1000>;
 			interrupts = <0 175 4>;
 		};
 

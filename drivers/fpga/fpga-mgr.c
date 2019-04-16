@@ -28,9 +28,12 @@
 #include <linux/scatterlist.h>
 #include <linux/highmem.h>
 #include "fpga-mgr-debugfs.h"
+#include <linux/cdev.h>
 
 static DEFINE_IDA(fpga_mgr_ida);
 static struct class *fpga_mgr_class;
+static int fpga_mgr_major;
+#define FPGA_MAX_MINORS	256
 
 /*
  * Call the low level driver's write_init function.  This will do the
@@ -311,21 +314,29 @@ int fpga_mgr_firmware_load(struct fpga_manager *mgr,
 EXPORT_SYMBOL_GPL(fpga_mgr_firmware_load);
 
 static const char * const state_str[] = {
+/*
 	[FPGA_MGR_STATE_UNKNOWN] =		"unknown",
 	[FPGA_MGR_STATE_POWER_OFF] =		"power off",
 	[FPGA_MGR_STATE_POWER_UP] =		"power up",
 	[FPGA_MGR_STATE_RESET] =		"reset",
+*/
+	[FPGA_MGR_STATE_UNKNOWN] =		"undetermined",
+	[FPGA_MGR_STATE_POWER_OFF] =		"powered off",
+	[FPGA_MGR_STATE_POWER_UP] =		"power up phase",
+	[FPGA_MGR_STATE_RESET] =		"reset phase",
 
 	/* requesting FPGA image from firmware */
 	[FPGA_MGR_STATE_FIRMWARE_REQ] =		"firmware request",
 	[FPGA_MGR_STATE_FIRMWARE_REQ_ERR] =	"firmware request error",
 
 	/* Preparing FPGA to receive image */
-	[FPGA_MGR_STATE_WRITE_INIT] =		"write init",
+	//[FPGA_MGR_STATE_WRITE_INIT] =		"write init",
+	[FPGA_MGR_STATE_WRITE_INIT] =		"initialization phase",
 	[FPGA_MGR_STATE_WRITE_INIT_ERR] =	"write init error",
 
 	/* Writing image to FPGA */
-	[FPGA_MGR_STATE_WRITE] =		"write",
+	[FPGA_MGR_STATE_WRITE] =		"configuration phase",
+	//[FPGA_MGR_STATE_WRITE] =		"write",
 	[FPGA_MGR_STATE_WRITE_ERR] =		"write error",
 
 	/* Finishing configuration after image has been written */
@@ -333,7 +344,8 @@ static const char * const state_str[] = {
 	[FPGA_MGR_STATE_WRITE_COMPLETE_ERR] =	"write complete error",
 
 	/* FPGA reports to be in normal operating mode */
-	[FPGA_MGR_STATE_OPERATING] =		"operating",
+	//[FPGA_MGR_STATE_OPERATING] =		"operating",
+	[FPGA_MGR_STATE_OPERATING] =		"user mode",
 };
 
 static ssize_t name_show(struct device *dev,
@@ -352,12 +364,40 @@ static ssize_t state_show(struct device *dev,
 	return sprintf(buf, "%s\n", state_str[mgr->state]);
 }
 
+static ssize_t status_show(struct device *dev,
+			   struct device_attribute *attr, char *buf)
+{
+	struct fpga_manager *mgr = to_fpga_manager(dev);
+//	u64 status;
+//	int len = 0;
+
+//	if (!mgr->mops->status)
+//		return -ENOENT;
+
+//	status = mgr->mops->status(mgr);
+
+//	if (status & FPGA_MGR_STATUS_OPERATION_ERR)
+//		len += sprintf(buf + len, "reconfig operation error\n");
+//	if (status & FPGA_MGR_STATUS_CRC_ERR)
+//		len += sprintf(buf + len, "reconfig CRC error\n");
+//	if (status & FPGA_MGR_STATUS_INCOMPATIBLE_IMAGE_ERR)
+//		len += sprintf(buf + len, "reconfig incompatible image\n");
+//	if (status & FPGA_MGR_STATUS_IP_PROTOCOL_ERR)
+//		len += sprintf(buf + len, "reconfig IP protocol error\n");
+//	if (status & FPGA_MGR_STATUS_FIFO_OVERFLOW_ERR)
+//		len += sprintf(buf + len, "reconfig fifo overflow error\n");
+//	return len;		
+	return sprintf(buf, "%s\n", state_str[mgr->state]);
+}
+
 static DEVICE_ATTR_RO(name);
 static DEVICE_ATTR_RO(state);
+static DEVICE_ATTR_RO(status);
 
 static struct attribute *fpga_mgr_attrs[] = {
 	&dev_attr_name.attr,
 	&dev_attr_state.attr,
+	&dev_attr_status.attr,
 	NULL,
 };
 ATTRIBUTE_GROUPS(fpga_mgr);
@@ -503,7 +543,9 @@ int fpga_mgr_register(struct device *dev, const char *name,
 	mgr->state = mgr->mops->state(mgr);
 
 	device_initialize(&mgr->dev);
+	mgr->dev.devt = MKDEV(fpga_mgr_major, id);
 	mgr->dev.class = fpga_mgr_class;
+	mgr->dev.groups = mops->groups;
 	mgr->dev.parent = dev;
 	mgr->dev.of_node = dev->of_node;
 	mgr->dev.id = id;
@@ -512,6 +554,14 @@ int fpga_mgr_register(struct device *dev, const char *name,
 	ret = dev_set_name(&mgr->dev, "fpga%d", id);
 	if (ret)
 		goto error_device;
+
+	cdev_init(&mgr->cdev, &socfpga_mgr_fops);
+
+	mgr->cdev.kobj.parent = &mgr->dev.kobj;
+
+	ret = cdev_add(&mgr->cdev, MKDEV(fpga_mgr_major,id), 1);
+	if (ret)
+		goto error_cdev;
 
 	ret = device_add(&mgr->dev);
 	if (ret)
@@ -525,6 +575,8 @@ int fpga_mgr_register(struct device *dev, const char *name,
 
 error_device:
 	ida_simple_remove(&fpga_mgr_ida, id);
+error_cdev:
+    cdev_del(&mgr->cdev);
 error_kfree:
 	kfree(mgr);
 
@@ -565,14 +617,24 @@ static void fpga_mgr_dev_release(struct device *dev)
 
 static int __init fpga_mgr_class_init(void)
 {
+	int ret;
+	dev_t fpga_mgr_devno;
 	pr_info("FPGA manager framework\n");
 
-	fpga_mgr_class = class_create(THIS_MODULE, "fpga_manager");
+	//fpga_mgr_class = class_create(THIS_MODULE, "fpga_manager");
+	fpga_mgr_class = class_create(THIS_MODULE, "fpga");
 	if (IS_ERR(fpga_mgr_class))
 		return PTR_ERR(fpga_mgr_class);
 
 	fpga_mgr_class->dev_groups = fpga_mgr_groups;
 	fpga_mgr_class->dev_release = fpga_mgr_dev_release;
+	ret = alloc_chrdev_region(&fpga_mgr_devno, 0, FPGA_MAX_MINORS, "fpga");
+	if (ret) {
+		class_destroy(fpga_mgr_class);
+		return ret;
+	}
+
+	fpga_mgr_major = MAJOR(fpga_mgr_devno);
 
 	fpga_mgr_debugfs_init();
 
