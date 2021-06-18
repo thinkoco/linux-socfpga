@@ -558,7 +558,7 @@ static enum fpga_mgr_states socfpga_fpga_ops_state(struct fpga_manager *mgr)
 }
 
 
-static u64 socfpga_mgr_status(struct fpga_manager *mgr)
+static u64 socfpga_mgr_status(struct fpga_manager *mgr, char *buf)
 {
 	struct socfpga_fpga_priv *priv = mgr->priv;
 	u32 state;
